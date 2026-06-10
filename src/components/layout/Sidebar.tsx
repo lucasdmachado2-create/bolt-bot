@@ -46,7 +46,7 @@ export function Sidebar() {
               <span className="text-[9px] uppercase tracking-wider text-muted-foreground">soon</span>
             </div>
           ) : (
-            <Link key={item.to} to={item.to} className={cls}>
+            <Link key={item.to} to={item.to as "/"} className={cls}>
               <Icon className="w-4 h-4" />
               <span>{item.label}</span>
             </Link>
