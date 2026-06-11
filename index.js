@@ -74,12 +74,15 @@ app.get('/api/bot/status', async (req, res) => {
 // 2. Resumo Financeiro (PnL) e Gráfico de Equity
 app.get('/api/pnl/summary', async (req, res) => {
     res.json({
-        todayUsdt: 12.50, todayPct: 0.25,
-        weekUsdt: 45.20, weekPct: 0.90,
-        monthUsdt: 120.00, monthPct: 2.40,
+        todayUsdt: 12.50, 
+        todayPct: 0.25,
+        weekUsdt: 45.20, 
+        weekPct: 0.90,
+        monthUsdt: 120.00, 
+        monthPct: 2.40,
         balanceUsdt: 5000.00,
+        // O campo equityCurve é obrigatório para o gráfico funcionar
         equityCurve: [
-            // As palavras exatas exigidas pelo EquityChart.tsx
             { date: '2026-06-09', equity: 4880, pnl: 50 },
             { date: '2026-06-10', equity: 4950, pnl: 70 },
             { date: '2026-06-11', equity: 5000, pnl: 50 }
