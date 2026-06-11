@@ -71,18 +71,18 @@ app.get('/api/bot/status', async (req, res) => {
 // Rota de Saldo e PnL (Lucro)
 app.get('/api/pnl/summary', async (req, res) => {
     res.json({
-        todayUsdt: 12.50, // Nome exato que a Vercel pediu!
+        todayUsdt: 12.50,
         todayPct: 0.25,
         weekUsdt: 45.20,
         weekPct: 0.90,
         monthUsdt: 120.00,
         monthPct: 2.40,
-        balanceUsdt: 5000.00, // Nosso famoso 5000!
+        balanceUsdt: 5000.00,
         equityCurve: [
-            // Gráfico de linha simples para não dar erro no <EquityChart />
-            { time: '2026-06-01', value: 4880 },
-            { time: '2026-06-05', value: 4950 },
-            { time: '2026-06-10', value: 5000 }
+            // Pacote à prova de balas: todos os nomes de variáveis possíveis para o gráfico
+            { time: '01 Jun', date: '01 Jun', name: '01 Jun', value: 4880, balance: 4880, amount: 4880, pnl: 4880, usdt: 4880 },
+            { time: '05 Jun', date: '05 Jun', name: '05 Jun', value: 4950, balance: 4950, amount: 4950, pnl: 4950, usdt: 4950 },
+            { time: '10 Jun', date: '10 Jun', name: '10 Jun', value: 5000, balance: 5000, amount: 5000, pnl: 5000, usdt: 5000 }
         ]
     });
 });
