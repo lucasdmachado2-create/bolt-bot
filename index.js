@@ -9,13 +9,17 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 // ==========================================
-// A MÁGICA DO CORS: Lista VIP de acessos
+// A MÁGICA DO CORS: Lista VIP Automática
 // ==========================================
 app.use(cors({
-    origin: [
-        'https://bolt-57wcvqgyt-lucasdmachado2-3245s-projects.vercel.app',
-        'https://bolt-bot.vercel.app'
-    ],
+    origin: function (origin, callback) {
+        // Aceita automaticamente qualquer link que venha da Vercel
+        if (!origin || origin.includes('vercel.app')) {
+            callback(null, true);
+        } else {
+            callback(new Error('Bloqueado pelo CORS'));
+        }
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
@@ -58,7 +62,7 @@ async function startServer() {
 app.get('/api/bot/status', async (req, res) => {
     res.json({
         status: 'online',
-        mode: 'PAPER TRADING',
+        mode: 'PAPER TRADING', // Quando integrarmos a Binance, isso vai mudar dinamicamente
         latency: '45ms',
         uptime: process.uptime()
     });
