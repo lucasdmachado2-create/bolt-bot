@@ -25,7 +25,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Conexões com Banco e Cache
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
@@ -51,79 +50,61 @@ async function startServer() {
 }
 
 // ==========================================
-// ROTAS DA API: O PACOTE "À PROVA DE FALHAS"
+// ROTAS DA API: O MAPA EXATO DA VERCEL
 // ==========================================
 
+// Rota de Status e Métricas
 app.get('/api/bot/status', async (req, res) => {
     res.json({
         status: 'online',
-        mode: 'PAPER TRADING',
-        latency: 45, 
-        uptime: process.uptime()
+        marketMode: 'BULL', // Pede texto: 'BULL', 'BEAR' ou 'NEUTRAL'
+        uptimeHours: 24.5, // O culpado 1! Precisava ser número.
+        btcOpenInterest: 18500000000, // Culpado 2! Precisava ser número grande para dividir por 1e9
+        btcFundingRate: 0.0015,
+        ethOpenInterest: 8200000000,
+        ethFundingRate: 0.0012,
+        marketPulse: 75,
+        fearGreed: 82
     });
 });
 
+// Rota de Saldo e PnL (Lucro)
 app.get('/api/pnl/summary', async (req, res) => {
-    // Enviamos todas as variações de nomes para o visual não dar erro de toFixed
     res.json({
-        today: 12.50,
-        todayPnl: 12.50,
-        daily: 12.50,
-        
-        week: 45.20,
-        weekly: 45.20,
-        weekPnl: 45.20,
-        
-        month: 120.00,
-        monthly: 120.00,
-        monthPnl: 120.00,
-        
-        balance: 5000.00,
-        totalBalance: 5000.00,
-        walletBalance: 5000.00,
-        
-        profit: 120.00,
-        totalProfit: 120.00,
-        pnl: 120.00,
-        
-        winRate: 65.5,
-        totalTrades: 15
+        todayUsdt: 12.50, // Nome exato que a Vercel pediu!
+        todayPct: 0.25,
+        weekUsdt: 45.20,
+        weekPct: 0.90,
+        monthUsdt: 120.00,
+        monthPct: 2.40,
+        balanceUsdt: 5000.00, // Nosso famoso 5000!
+        equityCurve: [
+            // Gráfico de linha simples para não dar erro no <EquityChart />
+            { time: '2026-06-01', value: 4880 },
+            { time: '2026-06-05', value: 4950 },
+            { time: '2026-06-10', value: 5000 }
+        ]
     });
 });
 
+// Rota do botão Ligar/Desligar
 app.post('/api/bot/toggle', async (req, res) => {
     const { active } = req.body;
     res.json({ success: true, message: `Bot ${active ? 'iniciado' : 'pausado'}` });
 });
 
+// Rota dos Trades Recentes
 app.get('/api/trades/recent', async (req, res) => {
-    // Adicionamos duas ordens falsas de teste para evitar que listas vazias quebrem o toFixed()
     res.json([
         {
             id: '1',
             pair: 'BTC/USDT',
             type: 'BUY',
-            side: 'buy', // variação
             price: 65000.00,
             amount: 0.1,
             profit: 15.50,
-            pnl: 15.50,
             status: 'CLOSED',
-            timestamp: new Date().toISOString(),
-            date: new Date().toISOString()
-        },
-        {
-            id: '2',
-            pair: 'ETH/USDT',
-            type: 'SELL',
-            side: 'sell',
-            price: 3500.00,
-            amount: 2.5,
-            profit: -5.20,
-            pnl: -5.20,
-            status: 'CLOSED',
-            timestamp: new Date().toISOString(),
-            date: new Date().toISOString()
+            timestamp: new Date().toISOString()
         }
     ]);
 });
