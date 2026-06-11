@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import express from 'express';
-import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -8,10 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-app.use(cors());
-app.use(express.json());
-
-// ROTA DA API: O seu cérebro de trading
+// API de Trading
 app.get('/api/pnl/summary', (req, res) => {
     res.json({
         todayUsdt: 12.50, todayPct: 0.25,
@@ -26,13 +22,12 @@ app.get('/api/pnl/summary', (req, res) => {
     });
 });
 
-// SERVIR O FRONTEND: O Railway passa a ser o seu servidor único
+// Serve o Frontend (se a pasta 'dist' existir)
 app.use(express.static(path.join(__dirname, 'dist')));
 
+// Redireciona tudo para o index.html (SPA)
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-app.listen(PORT, () => {
-    console.log(`🚀 CryptoBot Pro Institucional rodando em http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`Rodando em http://localhost:${PORT}`));
