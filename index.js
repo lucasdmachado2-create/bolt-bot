@@ -95,18 +95,7 @@ app.post('/api/bot/toggle', async (req, res) => {
 
 // Rota dos Trades Recentes
 app.get('/api/trades/recent', async (req, res) => {
-    res.json([
-        {
-            id: '1',
-            pair: 'BTC/USDT',
-            type: 'BUY',
-            price: 65000.00,
-            amount: 0.1,
-            profit: 15.50,
-            status: 'CLOSED',
-            timestamp: new Date().toISOString()
-        }
-    ]);
+    res.json([]); // Enviamos vazio para a interface não tentar formatar o que não existe
 });
 
 startServer();
