@@ -2,32 +2,47 @@ import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import Binance from 'node-binance-api';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// API de Trading
-app.get('/api/pnl/summary', (req, res) => {
-    res.json({
-        todayUsdt: 12.50, todayPct: 0.25,
-        weekUsdt: 45.20, weekPct: 0.90,
-        monthUsdt: 120.00, monthPct: 2.40,
-        balanceUsdt: 5000.00,
-        equityCurve: [
-            { date: '2026-06-09', equity: 4880, pnl: 50 },
-            { date: '2026-06-10', equity: 4950, pnl: 70 },
-            { date: '2026-06-11', equity: 5000, pnl: 50 }
-        ]
-    });
+// Configuração Profissional da Binance
+const binance = new Binance().options({
+  APIKEY: process.env.BINANCE_API_KEY,
+  APISECRET: process.env.BINANCE_API_SECRET,
+  useServerTime: true
 });
 
-// Serve o Frontend (se a pasta 'dist' existir)
+app.use(express.json());
+
+// --- ROTAS DA API (DADOS REAIS) ---
+app.get('/api/pnl/summary', async (req, res) => {
+    try {
+        const balances = await binance.balance();
+        const usdtBalance = balances.USDT ? parseFloat(balances.USDT.available) : 0;
+
+        res.json({
+            todayUsdt: 0, 
+            balanceUsdt: usdtBalance,
+            equityCurve: [
+                { date: new Date().toISOString().split('T')[0], equity: usdtBalance, pnl: 0 }
+            ]
+        });
+    } catch (error) {
+        console.error('Erro na sincronia Binance:', error);
+        res.status(500).json({ error: 'Falha ao sincronizar com a Binance' });
+    }
+});
+
+// --- SERVIR O FRONTEND ---
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// Redireciona tudo para o index.html (SPA)
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-app.listen(PORT, () => console.log(`Rodando em http://localhost:${PORT}`));
+app.listen(PORT, () => {
+    console.log(`🚀 Motor CryptoBot Pro ativo e sincronizado na porta ${PORT}`);
+});
