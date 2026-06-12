@@ -1,6 +1,12 @@
-FROM node:20-alpine
+FROM node:20-alpine AS base
 WORKDIR /app
+COPY package*.json ./
+RUN npm install
 COPY . .
-RUN npm cache clean --force && npm install --legacy-peer-deps
+RUN npm run build
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+COPY --from=base /app/.output ./.output
 EXPOSE 3000
-CMD ["node", "index.js"]
+CMD ["node", ".output/server/index.mjs"]
