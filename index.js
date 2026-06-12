@@ -3,33 +3,35 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Binance from 'node-binance-api';
+import { Telegraf } from 'telegraf';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Configuração Profissional da Binance
+// Configuração Binance
 const binance = new Binance().options({
   APIKEY: process.env.BINANCE_API_KEY,
   APISECRET: process.env.BINANCE_API_SECRET,
   useServerTime: true
 });
 
+// Configuração Telegram
+const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
+
 app.use(express.json());
+
+// --- FUNÇÃO DE ALERTA TELEGRAM ---
+async function enviarAlertaTelegram(mensagem) {
+    try {
+        await bot.telegram.sendMessage(process.env.TELEGRAM_CHAT_ID, `🤖 [CryptoBot Pro]: ${mensagem}`);
+    } catch (e) {
+        console.error("Erro ao enviar Telegram:", e);
+    }
+}
 
 // --- ROTAS DA API ---
 
-// 1. Status Geral
-app.get('/api/bot/status', (req, res) => {
-    res.json({
-        status: 'online', marketMode: 'BULL', uptimeHours: 73.0,
-        btcOpenInterest: 12840000000, btcFundingRate: 0.0089,
-        ethOpenInterest: 7210000000, ethFundingRate: 0.0112,
-        marketPulse: 64, fearGreed: 58
-    });
-});
-
-// 2. Resumo Financeiro (PnL) e Equity Curve (Sincronizado)
 app.get('/api/pnl/summary', async (req, res) => {
     try {
         const balances = await binance.balance();
@@ -47,24 +49,18 @@ app.get('/api/pnl/summary', async (req, res) => {
             ]
         });
     } catch (error) {
-        res.status(500).json({ error: 'Falha ao buscar saldo' });
+        res.status(500).json({ error: 'Falha na Binance' });
     }
 });
 
-// 3. Trades Recentes (Formatados para o TradeRow)
-app.get('/api/trades/recent', (req, res) => {
-    res.json([
-        {
-            id: '1', symbol: 'SOL/USDT', executionType: 'LIMIT',
-            entryPrice: 178.42, exitPrice: 181.05, profitUsdt: 8.12,
-            profitPct: 1.21, status: 'CLOSED', timestamp: new Date().toISOString()
-        },
-        {
-            id: '2', symbol: 'AR/USDT', executionType: 'LIMIT',
-            entryPrice: 41.20, exitPrice: 40.86, profitUsdt: -7.45,
-            profitPct: -1.49, status: 'CLOSED', timestamp: new Date().toISOString()
-        }
-    ]);
+app.get('/api/bot/status', (req, res) => {
+    res.json({ status: 'online', marketMode: 'BULL', uptimeHours: 73.0 });
+});
+
+// Rota de teste para ver se o Telegram está a funcionar
+app.post('/api/test-telegram', async (req, res) => {
+    await enviarAlertaTelegram("Teste de conexão institucional bem-sucedido!");
+    res.json({ success: true });
 });
 
 // --- SERVIR FRONTEND ---
@@ -73,4 +69,7 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-app.listen(PORT, () => console.log(`🚀 Motor CryptoBot Pro Institucional rodando na porta ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`🚀 CryptoBot Pro rodando em ${PORT}`);
+    enviarAlertaTelegram("Bot iniciado com sucesso!");
+});
