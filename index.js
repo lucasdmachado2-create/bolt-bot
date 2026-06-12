@@ -5,30 +5,33 @@ import Binance from 'node-binance-api';
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Inicializa conexão com Binance
-const binance = new Binance().options({
-  APIKEY: process.env.BINANCE_API_KEY,
-  APISECRET: process.env.BINANCE_API_SECRET,
-  useServerTime: true
-});
-
-app.get('/', (req, res) => {
-    res.send('CryptoBot Pro está online!');
-});
-
-// Rota de teste para validar a conexão com a Binance
 app.get('/api/test-binance', async (req, res) => {
+    // 1. Verificar se as variáveis estão a chegar ao Node.js
+    const key = process.env.BINANCE_API_KEY;
+    const secret = process.env.BINANCE_API_SECRET;
+
+    if (!key || !secret) {
+        return res.json({ erro: "Variáveis de ambiente não encontradas pelo servidor" });
+    }
+
     try {
-        const balance = await binance.balance();
-        res.json({ 
-            status: 'Conexão Sucesso', 
-            saldo_usdt: balance.USDT ? balance.USDT.available : 'Saldo não encontrado' 
+        // 2. Inicialização explícita
+        const binance = new Binance().options({
+            APIKEY: key,
+            APISECRET: secret,
+            useServerTime: true,
+            verbose: true // Isso vai imprimir logs no console do Railway
         });
+
+        // 3. Teste de balance com timeout
+        const balance = await binance.balance();
+        res.json({ status: 'Sucesso', saldo: balance });
+        
     } catch (e) {
-        res.status(500).json({ erro: 'Falha na conexão: ' + e.message });
+        // Log detalhado do erro
+        console.error("ERRO DETALHADO:", e);
+        res.json({ erro: 'Falha na conexão: ' + (e.message || 'Erro desconhecido') });
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
-});
+app.listen(PORT, () => console.log('Servidor rodando na porta ' + PORT));
