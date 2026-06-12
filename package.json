@@ -11,10 +11,13 @@
     "@tanstack/react-query": "^5.0.0",
     "@tanstack/react-router": "^1.0.0",
     "@tanstack/react-start": "^1.0.0",
+    "clsx": "^2.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "node-binance-api": "^0.13.1",
+    "recharts": "^2.15.4",
+    "tailwind-merge": "^2.3.0",
     "telegraf": "^4.16.3",
     "vinxi": "^0.4.0"
   }
