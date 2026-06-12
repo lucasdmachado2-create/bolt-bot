@@ -1,3 +1,6 @@
+[build]
+builder = "nixpacks"
+
 [phases.setup]
 nixPkgs = ["nodejs-20_x"]
 
@@ -10,5 +13,5 @@ cmds = ["npm run build"]
 [start]
 cmd = "node .output/server/index.mjs"
 git add .
-git commit -m "config: forcing nixpacks alignment"
+git commit -m "infra: switching configuration to railway.toml"
 git push origin main
