@@ -9,3 +9,6 @@ cmds = ["npm run build"]
 
 [start]
 cmd = "node .output/server/index.mjs"
+git add .
+git commit -m "config: forcing nixpacks alignment"
+git push origin main
